@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Sklep Robug</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #050505;
+  color: #00ff66;
+  text-align: center;
+  margin: 0;
+}
+
+/* 🔝 Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #00ff66;
+}
+
+.left, .right {
+  display: flex;
+  gap: 15px;
+}
+
+.icon {
+  font-size: 22px;
+  text-decoration: none;
+  color: #00ff66;
+}
+
+/* Store */
+.pack, .cart {
+  border: 1px solid #00ff66;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
+  width: 220px;
+  background: #0b0b0b;
+}
+
+button {
+  padding: 8px;
+  margin: 5px;
+  background: #00ff66;
+  border: none;
+  color: black;
+  cursor: pointer;
+}
+
+#checkout {
+  display: none;
+  margin-top: 20px;
+  padding: 20px;
+  border: 2px solid #00ff66;
+}
+
+.btc {
+  background: #111;
+  padding: 10px;
+  border: 1px dashed #00ff66;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="left">
+    <a href="blackjack.html" class="icon">🃏</a>
+  </div>
+  <div class="right">
+    <a href="account.html" class="icon">👤</a>
+  </div>
+</div>
+
+<h1>🪙 Sklep Robug</h1>
+
+<div id="store"></div>
+
+<h2>🛒 Koszyk</h2>
+<div id="cart"></div>
+
+<button onclick="checkout()">Płatność</button>
+
+<div id="checkout">
+  <h2>Paypal</h2>
+  <div class="btc">
+    paypal.me/NarkizStrauss
+  </div>
+  <p id="total"></p>
+</div>
+
+<script>
+const packs = [
+  { robug: 24000, price: 383 },
+  { robug: 11000, price: 200 },
+  { robug: 5250, price: 100 },
+  { robug: 3625, price: 67 },
+  { robug: 2000, price: 40 },
+  { robug: 1500, price: 27 },
+  { robug: 1000, price: 20 },
+  { robug: 500, price: 10 }
+];
+
+let cart = [];
+
+function renderStore() {
+  store.innerHTML = "";
+  packs.forEach((p,i)=>{
+    store.innerHTML += `
+      <div class="pack">
+        <h3>${p.robug} Robug</h3>
+        <p>${p.price} PLN</p>
+        <button onclick="add(${i})">Dodaj</button>
+      </div>`;
+  });
+}
+
+function add(i){
+  cart.push(packs[i]);
+  renderCart();
+}
+
+function remove(i){
+  cart.splice(i,1);
+  renderCart();
+}
+
+function renderCart(){
+  cartDiv.innerHTML="";
+  let total=0;
+
+  cart.forEach((c,i)=>{
+    total+=c.price;
+    cartDiv.innerHTML+=`
+      <div class="cart">
+        ${c.robug} Robug - ${c.price} PLN
+        <br>
+        <button onclick="remove(${i})" style="background:red;color:white;">Usuń</button>
+      </div>`;
+  });
+
+  cartDiv.innerHTML+=`<h3>${total} PLN</h3>`;
+}
+
+function checkout(){
+  checkoutBox.style.display="block";
+  let total = cart.reduce((s,i)=>s+i.price,0);
+  totalText.innerText="Do zapłaty: "+total+" PLN";
+}
+
+const store=document.getElementById("store");
+const cartDiv=document.getElementById("cart");
+const checkoutBox=document.getElementById("checkout");
+const totalText=document.getElementById("total");
+
+renderStore();
+</script>
+
+</body>
+</html>

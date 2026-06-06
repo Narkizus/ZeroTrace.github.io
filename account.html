@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Konto</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #050505;
+  color: #00ff66;
+  text-align: center;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #00ff66;
+}
+
+.icon {
+  font-size: 22px;
+  text-decoration: none;
+  color: #00ff66;
+}
+
+.box {
+  border: 1px solid #00ff66;
+  padding: 20px;
+  width: 300px;
+  margin: 20px auto;
+}
+
+input {
+  margin:5px;
+  padding:8px;
+  background:#111;
+  border:1px solid #00ff66;
+  color:#00ff66;
+}
+
+button {
+  padding:8px;
+  background:#00ff66;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <a href="blackjack.html" class="icon">🃏</a>
+  <a href="index.html" class="icon">🏠</a>
+</div>
+
+<h1>👤 Konto</h1>
+
+<div id="auth" class="box">
+  <input id="u" placeholder="Login"><br>
+  <input id="p" type="password" placeholder="Hasło"><br>
+  <button onclick="reg()">Rejestracja</button>
+  <button onclick="log()">Login</button>
+</div>
+
+<div id="panel" class="box" style="display:none;"></div>
+
+<script>
+let currentUser = localStorage.getItem("currentUser");
+
+function reg(){
+  let users = JSON.parse(localStorage.getItem("users"))||{};
+  if(users[u.value]) return alert("Istnieje");
+
+  users[u.value]={password:p.value,robug:500}; // 🎁 start bonus
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("OK");
+}
+
+function log(){
+  let users = JSON.parse(localStorage.getItem("users"))||{};
+  if(!users[u.value]||users[u.value].password!==p.value)
+    return alert("Błąd");
+
+  localStorage.setItem("currentUser",u.value);
+  currentUser=u.value;
+  update();
+}
+
+function logout(){
+  localStorage.removeItem("currentUser");
+  currentUser=null;
+  update();
+}
+
+function update(){
+  if(!currentUser){
+    auth.style.display="block";
+    panel.style.display="none";
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem("users"));
+
+  auth.style.display="none";
+  panel.style.display="block";
+
+  panel.innerHTML=`
+    <h2>${currentUser}</h2>
+    <p>Saldo: ${users[currentUser].robug} Robug</p>
+
+    <button onclick="location.href='blackjack.html'">🃏 Graj</button>
+    <br><br>
+    <button onclick="logout()">Wyloguj</button>
+  `;
+}
+
+update();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack Robug</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #050505;
+  color: #00ff66;
+  text-align: center;
+}
+
+.card {
+  display: inline-block;
+  border: 1px solid #00ff66;
+  padding: 10px;
+  margin: 5px;
+  width: 50px;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
+  background: #00ff66;
+  border: none;
+  color: black;
+  cursor: pointer;
+}
+
+.box {
+  border: 1px solid #00ff66;
+  padding: 20px;
+  margin: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🃏 Blackjack</h1>
+<a href="account.html" style="color:#00ff66;">⬅ Powrót</a>
+
+<div id="game" class="box"></div>
+
+<script>
+let currentUser = localStorage.getItem("currentUser");
+let users = JSON.parse(localStorage.getItem("users")) || {};
+
+if (!currentUser || !users[currentUser]) {
+  document.body.innerHTML = "<h2>Zaloguj się najpierw!</h2><a href='account.html'>Login</a>";
+  throw "";
+}
+
+let player = [];
+let dealer = [];
+let bet = 0;
+let gameActive = false;
+
+function drawCard() {
+  return Math.floor(Math.random() * 11) + 1;
+}
+
+function handValue(hand) {
+  return hand.reduce((a,b)=>a+b,0);
+}
+
+function startGame() {
+  bet = 100;
+
+  if (users[currentUser].robug < bet) {
+    alert("Za mało Robug!");
+    return;
+  }
+
+  users[currentUser].robug -= bet;
+
+  player = [drawCard(), drawCard()];
+  dealer = [drawCard(), drawCard()];
+
+  gameActive = true;
+  save();
+  render();
+}
+
+function hit() {
+  if (!gameActive) return;
+  player.push(drawCard());
+
+  if (handValue(player) > 21) endGame();
+  render();
+}
+
+function stand() {
+  while (handValue(dealer) < 17) {
+    dealer.push(drawCard());
+  }
+  endGame();
+}
+
+function endGame() {
+  gameActive = false;
+
+  let p = handValue(player);
+  let d = handValue(dealer);
+
+  let result = "";
+
+  if (p > 21) result = "Przegrana";
+  else if (d > 21 || p > d) {
+    result = "Wygrana!";
+    users[currentUser].robug += bet * 2;
+  }
+  else if (p === d) {
+    result = "Remis";
+    users[currentUser].robug += bet;
+  }
+  else result = "Przegrana";
+
+  alert(result);
+  save();
+  render();
+}
+
+function save() {
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+function render() {
+  game.innerHTML = `
+    <p>Gracz: ${player.join(", ")} (${handValue(player)})</p>
+    <p>Dealer: ${gameActive ? dealer[0] + ", ?" : dealer.join(", ")} (${gameActive ? "?" : handValue(dealer)})</p>
+
+    <button onclick="startGame()">Nowa gra (100 Robug)</button>
+    <button onclick="hit()">Dobierz</button>
+    <button onclick="stand()">Stój</button>
+
+    <h3>Saldo: ${users[currentUser].robug} Robug</h3>
+  `;
+}
+
+render();
+</script>
+
+</body>
+</html>
